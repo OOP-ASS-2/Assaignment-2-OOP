@@ -1,48 +1,65 @@
 #include <JuceHeader.h>
 #include "MainComponent.h"
 
-// Our application class
-class SimpleAudioPlayer : public juce::JUCEApplication
+//==============================================================================
+class NewProjectApplication : public juce::JUCEApplication
 {
 public:
-    const juce::String getApplicationName() override { return "Simple Audio Player"; }
-    const juce::String getApplicationVersion() override { return "1.0"; }
+    //==============================================================================
+    const juce::String getApplicationName() override { return "NewProject"; }
+    const juce::String getApplicationVersion() override { return "1.0.0"; }
+    bool moreThanOneInstanceAllowed() override { return true; }
 
+    //==============================================================================
     void initialise(const juce::String&) override
     {
-        // Create and show the main window
-        mainWindow = std::make_unique<MainWindow>(getApplicationName());
+        mainWindow.reset(new MainWindow("NewProject", new MainComponent(), *this));
     }
 
     void shutdown() override
     {
-        mainWindow = nullptr; // Clean up
+        mainWindow = nullptr;
     }
 
-private:
-    // The main window of the app
+    //==============================================================================
+    void systemRequestedQuit() override
+    {
+        quit();
+    }
+
+    void anotherInstanceStarted(const juce::String&) override {}
+
+    //==============================================================================
     class MainWindow : public juce::DocumentWindow
     {
     public:
-        MainWindow(juce::String name)
+        MainWindow(juce::String name, juce::Component* c, JUCEApplication& a)
             : DocumentWindow(name,
-                juce::Colours::lightgrey,
-                DocumentWindow::allButtons)
+                juce::Desktop::getInstance().getDefaultLookAndFeel()
+                .findColour(ResizableWindow::backgroundColourId),
+                DocumentWindow::allButtons),
+            app(a)
         {
             setUsingNativeTitleBar(true);
-            setContentOwned(new MainComponent(), true); // MainComponent = our UI + logic
-            centreWithSize(400, 200);
+            setContentOwned(c, true);
+            setResizable(true, true);
+            centreWithSize(getWidth(), getHeight());
             setVisible(true);
         }
 
         void closeButtonPressed() override
         {
-            juce::JUCEApplication::getInstance()->systemRequestedQuit();
+            app.systemRequestedQuit();
         }
+
+    private:
+        JUCEApplication& app;
     };
 
+private:
     std::unique_ptr<MainWindow> mainWindow;
 };
 
-// This macro starts the app
-START_JUCE_APPLICATION(SimpleAudioPlayer)
+//==============================================================================
+// This macro generates the main() routine that launches the app.
+START_JUCE_APPLICATION(NewProjectApplication)
