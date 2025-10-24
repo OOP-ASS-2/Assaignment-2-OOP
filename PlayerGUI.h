@@ -24,6 +24,8 @@ private:
 	juce::TextButton playButton{ "play" };
 	juce::TextButton loopButton{ "loop" };
 	juce::TextButton muteButton{ "Mute" };
+	juce::TextButton goStartButton{ "start" };
+	juce::TextButton goEndButton{ "end" };
 
 
 	juce::Slider volumeSlider;
@@ -38,3 +40,4 @@ private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
+
