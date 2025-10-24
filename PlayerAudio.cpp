@@ -1,110 +1,90 @@
 
-
 #include "PlayerAudio.h"
 
-// Constructor: بيشتغل أول ما البرنامج يفتح
 PlayerAudio::PlayerAudio()
 {
-    // بيسجل الصيغ المشهورة زي WAV و MP3 عشان البرنامج يقدر يقرأهم
-    formatManager.registerBasicFormats();
+	formatManager.registerBasicFormats();
 }
 
-// Destructor: بيشتغل لما البرنامج بيتقفل عشان ينضف الذاكرة
 PlayerAudio::~PlayerAudio()
 {
-    transportSource.setSource(nullptr);
 }
-
-// ==============================================================================
-// دوال الصوت الأساسية (تبع JUCE)
-// ==============================================================================
 
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
-    transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+	transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    transportSource.getNextAudioBlock(bufferToFill);
+	transportSource.getNextAudioBlock(bufferToFill);
 }
 
 void PlayerAudio::releaseResources()
 {
-    transportSource.releaseResources();
+	transportSource.releaseResources();
 }
 
-// ==============================================================================
-// دوال التحكم في التشغيل (الجزء المدموج)
-// ==============================================================================
-
-// أنا أخدت نسخة زميلك من دالة loadFile لأنها آمن وأفضل
-void PlayerAudio::loadFile(const juce::File& file)
+bool PlayerAudio::loadFile(const juce::File& file)
 {
-    if (file.existsAsFile())
-    {
-        if (auto* reader = formatManager.createReaderFor(file))
-        {
-            // بنوقف أي صوت شغال قبل ما نحمل الجديد
-            transportSource.stop();
-            // بنجهز الملف الجديد
-            readerSource.reset(new juce::AudioFormatReaderSource(reader, true));
-            transportSource.setSource(readerSource.get(), 0, nullptr, reader->sampleRate);
-        }
-    }
+	if (file.existsAsFile())
+	{
+		if (auto* reader = formatManager.createReaderFor(file))
+		{
+			// ?? Disconnect old source first
+			transportSource.stop();
+			transportSource.setSource(nullptr);
+			readerSource.reset();
+
+			// Create new reader source
+			readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
+
+			// Attach safely
+			transportSource.setSource(readerSource.get(),
+				0,
+				nullptr,
+				reader->sampleRate);
+			transportSource.start();
+		}
+	}
+	return true;
 }
 
-// --- كل دوال التحكم من الكودين ---
-void PlayerAudio::play() { transportSource.start(); }
-void PlayerAudio::pause() { transportSource.stop(); }
-void PlayerAudio::stop() { transportSource.stop(); transportSource.setPosition(0.0); }
-void PlayerAudio::restart() { transportSource.setPosition(0.0); transportSource.start(); }
-void PlayerAudio::goToStart() { transportSource.setPosition(0.0); }
-
-void PlayerAudio::goToEnd()
+void PlayerAudio::start()
 {
-    if (readerSource)
-        transportSource.setPosition(readerSource->getTotalLength() / readerSource->getAudioFormatReader()->sampleRate);
-}
+	transportSource.start();
+}	
 
-void PlayerAudio::setGain(float newGain)
+void PlayerAudio::stop()
 {
-    transportSource.setGain(newGain);
-
-    // لو المستخدم غير الصوت، نتأكد إن البرنامج مش في وضع الكتم
-    if (newGain > 0.0f)
-    {
-        isMuted = false;
-    }
+	transportSource.stop();
 }
 
-void PlayerAudio::setPosition(double position)
+void PlayerAudio::setGain(float gain)
 {
-    transportSource.setPosition(position);
+	transportSource.setGain(gain);
 }
 
-// الإضافة بتاعتك لخاصية اللوب
+void PlayerAudio::setPosition(double pos)
+{
+	transportSource.setPosition(pos);
+}
+
+double PlayerAudio::getPosition() const
+{
+	return transportSource.getCurrentPosition();
+}
+
+double PlayerAudio::getLength() const
+{
+	return transportSource.getLengthInSeconds();
+}
+
 void PlayerAudio::setLooping(bool shouldLoop)
 {
-    if (readerSource != nullptr)
-    {
-        readerSource->setLooping(shouldLoop);
-    }
-}
-
-void PlayerAudio::toggleMute()
-{
-    isMuted = !isMuted; // اعكس حالة الكتم (لو true تبقى false والعكس)
-
-    if (isMuted)
-    {
-        // لو بنعمل كتم دلوقتي
-        lastKnownVolume = transportSource.getGain(); // احفظ مستوى الصوت الحالي
-        transportSource.setGain(0.0f); // خلي مستوى الصوت صفر (كتم)
-    }
-    else
-    {
-        // لو بنلغي الكتم
-        transportSource.setGain(lastKnownVolume); // رجّع الصوت لآخر قيمة محفوظة
-    }
+	
+	if (readerSource.get() != nullptr) {
+		readerSource->setLooping(shouldLoop);
+	}
+	transportSource.setLooping(shouldLoop);
 }
