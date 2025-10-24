@@ -1,3 +1,4 @@
+
 #include <JuceHeader.h>
 #include "MainComponent.h"
 
@@ -13,6 +14,7 @@ public:
     //==============================================================================
     void initialise(const juce::String&) override
     {
+        // السطر ده بينشئ النافذة الرئيسية ويحط جواها الـ MainComponent بتاعكم
         mainWindow.reset(new MainWindow("NewProject", new MainComponent(), *this));
     }
 
@@ -42,13 +44,17 @@ public:
         {
             setUsingNativeTitleBar(true);
             setContentOwned(c, true);
+
+            // السطر ده بيخلي الشاشة قابلة للتكبير والتصغير (ميزة إضافية)
             setResizable(true, true);
+
             centreWithSize(getWidth(), getHeight());
             setVisible(true);
         }
 
         void closeButtonPressed() override
         {
+            // هنا بيستخدم الطريقة الأفضل لطلب إغلاق التطبيق
             app.systemRequestedQuit();
         }
 
