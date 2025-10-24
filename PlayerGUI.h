@@ -1,45 +1,40 @@
-
-
-#pragma once
-
+#pragma once // PlayerGUI.h
 #include <JuceHeader.h>
-#include "PlayerAudio.h" // مهم لكي تعرف الواجهة بوجود محرك الصوت
-
+#include "PlayerAudio.h"
 class PlayerGUI : public juce::Component,
-    public juce::Button::Listener,
-    public juce::Slider::Listener
+	public juce::Button::Listener,
+	public juce::Slider::Listener
 {
 public:
-    // نستخدم هذا الـ Constructor لأنه يربط الواجهة بالمحرك الصوتي بطريقة صحيحة
-    PlayerGUI(PlayerAudio& player);
-    ~PlayerGUI() override;
+	PlayerGUI();
+	~PlayerGUI() override;
+	void resized() override;
+	void paint(juce::Graphics& g) override;
+	void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
+	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
+	void releaseResources();
 
-    // --- دوال الواجهة الرسومية ---
-    void paint(juce::Graphics& g) override;
-    void resized() override;
-
+	
 private:
-    // --- دوال الاستجابة لأفعال المستخدم ---
-    void buttonClicked(juce::Button* button) override;
-    void sliderValueChanged(juce::Slider* slider) override;
+	PlayerAudio playerAudio;
+	// GUI elements
+	juce::TextButton loadButton{ "Load File" };
+	juce::TextButton restartButton{ "Restart" };
+	juce::TextButton stopButton{ "Stop" };
+	juce::TextButton playButton{ "play" };
+	juce::TextButton loopButton{ "loop" };
+	juce::TextButton muteButton{ "Mute" };
 
-    // مرجع إلى محرك الصوت للتحكم فيه (من تصميمك الصحيح)
-    PlayerAudio& playerAudio;
 
-    // --- مكونات الواجهة الرسومية (مدمجة من الكودين) ---
-    juce::TextButton loadButton{ "Load" };
-    juce::TextButton playButton{ "Play" };
-    juce::TextButton pauseButton{ "Pause" };
-    juce::TextButton stopButton{ "Stop" };
-    juce::TextButton restartButton{ "Restart" };
-    juce::TextButton startButton{ "Start" }; // Go to Start
-    juce::TextButton endButton{ "End" }; // Go to End
-    juce::ToggleButton loopButton{ "Loop" };   // الزر الخاص بك
-    juce::TextButton muteButton{ "Mute" };
+	juce::Slider volumeSlider;
+	std::unique_ptr<juce::FileChooser> fileChooser;
+	// Event handlers
+	void buttonClicked(juce::Button* button) override;
+	void sliderValueChanged(juce::Slider* slider) override;
+	bool stutes = false;
+	
+	bool isMuted = false;
+	float lastVolume = 1.0f; 
 
-    juce::Slider volumeSlider;
-
-    std::unique_ptr<juce::FileChooser> fileChooser;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
