@@ -1,43 +1,24 @@
-
-
-#pragma once
+#pragma once // PlayerAudio.h
 #include <JuceHeader.h>
-
 class PlayerAudio
 {
 public:
-    // Constructor and Destructor
-    PlayerAudio();
-    ~PlayerAudio(); // مهم لإدارة الذاكرة
-
-    // --- دوال الصوت الأساسية ---
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
-    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
-    void releaseResources();
-
-    // --- دوال التحكم في التشغيل (مدمجة من الكودين) ---
-    void loadFile(const juce::File& file);
-    void play();
-    void pause();
-    void stop();
-    void restart();
-    void goToStart();
-    void goToEnd();
-    void setGain(float newGain);
-
-    // الدالة دي من نسختك أنت
-    void setPosition(double position);
-
-    // ودي كمان، أهم إضافة بتاعتك (زرار اللوب)
-    void setLooping(bool shouldLoop);
-
-    void toggleMute();
-
+	PlayerAudio();
+	~PlayerAudio();
+	void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
+	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill);
+	void releaseResources();
+	bool loadFile(const juce::File& file);
+	void start();
+	void stop();
+	void setGain(float gain);
+	void setPosition(double pos);
+	double getPosition() const;
+	double getLength() const;
+	void setLooping(bool shouldLoop);
 private:
-    juce::AudioFormatManager formatManager;
-    std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
-    juce::AudioTransportSource transportSource;
-
-    bool isMuted = false;       // متغير عشان نعرف حالة الكتم الحالية
-    float lastKnownVolume = 0.5f; // متغير عشان نحفظ آخر مستوى صوت قبل الكتم
+	juce::AudioFormatManager formatManager;
+	std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
+	juce::AudioTransportSource transportSource;
+	// JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };
