@@ -1,12 +1,12 @@
 
+
 #pragma once
 #include <JuceHeader.h>
 #include "PlayerGUI.h"
 
 //==============================================================================
-// Main Component - يحتوي على لاعبين (2 PlayerGUI)
-//==============================================================================
-class MainComponent : public juce::AudioAppComponent
+class MainComponent : public juce::AudioAppComponent,
+    public juce::Slider::Listener
 {
 public:
     MainComponent();
@@ -18,12 +18,17 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void sliderValueChanged(juce::Slider* slider) override;
 
 private:
     PlayerGUI player1;
     PlayerGUI player2;
-    // ... (داخل private:)
-    juce::MixerAudioSource mixerSource; // << أضف هذا السطر
+    juce::MixerAudioSource mixerSource;
+
+    juce::Slider masterVolumeSlider;
+
+    // << إضافة: متغير لتخزين قيمة الصوت >>
+    float masterGain = 0.75f; // << 1. أضف هذا السطر
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
