@@ -106,3 +106,10 @@ juce::AudioTransportSource* PlayerAudio::getTransportSource()
 {
     return &transportSource;
 }
+
+juce::AudioSource* PlayerAudio::getOutputAudioSource()
+{
+    // الدالة دي بترجع "مغير السرعة"
+    // لأنه هو اللي بيحتوي على الصوت بعد تعديل سرعته
+    return &resamplingSource;
+}
