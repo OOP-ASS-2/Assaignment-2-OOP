@@ -1,4 +1,5 @@
-﻿#include "MainComponent.h"
+
+#include "MainComponent.h"
 
 //==============================================================================
 // Constructor
@@ -13,6 +14,9 @@ MainComponent::MainComponent()
 
     // تفعيل الصوت (0 مداخل - 2 مخارج)
     setAudioChannels(0, 2);
+
+    mixerSource.addInputSource(player1.getTransportSource(), false);
+    mixerSource.addInputSource(player2.getTransportSource(), false);
 }
 
 // Destructor
@@ -25,20 +29,20 @@ MainComponent::~MainComponent()
 // Audio functions
 void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
-    player1.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    player2.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    // جهز الميكسر للتشغيل
+    mixerSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    player1.getNextAudioBlock(bufferToFill);
-    player2.getNextAudioBlock(bufferToFill);
+    // اطلب من الميكسر ملء مخزن الصوت
+    mixerSource.getNextAudioBlock(bufferToFill);
 }
 
 void MainComponent::releaseResources()
 {
-    player1.releaseResources();
-    player2.releaseResources();
+    // أفرغ الميكسر
+    mixerSource.releaseResources();
 }
 
 //==============================================================================
