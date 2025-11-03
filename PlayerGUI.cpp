@@ -1,3 +1,4 @@
+
 #include "PlayerGUI.h"
 
 PlayerGUI::PlayerGUI()
@@ -7,7 +8,7 @@ PlayerGUI::PlayerGUI()
         addAndMakeVisible(btn);
         btn->addListener(this);
     }
-
+    addAndMakeVisible(waveformDisplay); // << أضف هذا السطر
     addAndMakeVisible(loopButton);
     loopButton.addListener(this);
 
@@ -15,6 +16,17 @@ PlayerGUI::PlayerGUI()
     volumeSlider.setValue(0.5);
     volumeSlider.addListener(this);
     addAndMakeVisible(volumeSlider);
+
+    // إعداد سلايدر السرعة
+    addAndMakeVisible(speedSlider);
+    speedSlider.setRange(0.5, 2.0, 0.01); // سرعة من 0.5x إلى 2.0x
+    speedSlider.setValue(1.0); // القيمة الافتراضية
+    speedSlider.addListener(this);
+
+    // إعداد العنوان الصغير بجانب السلايدر
+    addAndMakeVisible(speedLabel);
+    speedLabel.attachToComponent(&speedSlider, true); // اربطه بالسلايدر
+
 }
 
 PlayerGUI::~PlayerGUI() {}
@@ -48,6 +60,9 @@ void PlayerGUI::resized()
     int x = gap;
     int y = gap;
 
+    waveformDisplay.setBounds(gap, y, getWidth() - (gap * 2), 100); // << أضف هذا السطر
+    y += 100 + gap; // انزل تحت شاشة الموجة
+
     loadButton.setBounds(x, y, 80, buttonHeight);
     x += 90;
     playButton.setBounds(x, y, 80, buttonHeight);
@@ -64,6 +79,9 @@ void PlayerGUI::resized()
 
     y += buttonHeight + 10;
     volumeSlider.setBounds(gap, y, getWidth() - gap * 2, 30);
+
+    y += 40; // انزل مسافة جديدة
+    speedSlider.setBounds(gap + 50, y, getWidth() - gap * 2 - 50, 30); // << تعديل
 }
 
 void PlayerGUI::buttonClicked(juce::Button* button)
@@ -94,5 +112,11 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &volumeSlider)
+    {
         playerAudio.setGain((float)slider->getValue());
+    }
+    else if (slider == &speedSlider) // << أضف هذا الشرط
+    {
+        playerAudio.setSpeed(slider->getValue());
+    }
 }
