@@ -25,6 +25,7 @@ public:
     // دوال جديدة خاصة بالـ Waveform
     juce::AudioThumbnail& getThumbnail();
     juce::AudioTransportSource* getTransportSource();
+    juce::AudioSource* getOutputAudioSource(); // << أضف هذا السطر
     
 private:
     juce::AudioFormatManager formatManager;
