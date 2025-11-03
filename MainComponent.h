@@ -1,4 +1,5 @@
-﻿#pragma once
+
+#pragma once
 #include <JuceHeader.h>
 #include "PlayerGUI.h"
 
@@ -21,6 +22,8 @@ public:
 private:
     PlayerGUI player1;
     PlayerGUI player2;
+    // ... (داخل private:)
+    juce::MixerAudioSource mixerSource; // << أضف هذا السطر
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
