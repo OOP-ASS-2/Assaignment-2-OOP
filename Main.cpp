@@ -1,4 +1,4 @@
-
+//new
 #include <JuceHeader.h>
 #include "MainComponent.h"
 
@@ -79,3 +79,4 @@ private:
 // Entry point
 //==============================================================================
 START_JUCE_APPLICATION(AudioMixerApp)
+
