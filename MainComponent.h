@@ -1,10 +1,8 @@
-
-
 #pragma once
 #include <JuceHeader.h>
 #include "PlayerGUI.h"
+#include "Playlist.h" 
 
-//==============================================================================
 class MainComponent : public juce::AudioAppComponent,
     public juce::Slider::Listener
 {
@@ -23,12 +21,12 @@ public:
 private:
     PlayerGUI player1;
     PlayerGUI player2;
+    Playlist playlist;
+
     juce::MixerAudioSource mixerSource;
-
     juce::Slider masterVolumeSlider;
-
-    // << إضافة: متغير لتخزين قيمة الصوت >>
-    float masterGain = 0.75f; // << 1. أضف هذا السطر
+    juce::Slider crossfaderSlider;
+    float masterGain = 0.75f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
